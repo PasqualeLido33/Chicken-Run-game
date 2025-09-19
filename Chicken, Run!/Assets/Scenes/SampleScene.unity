@@ -890,7 +890,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 371c1fdda9aaca449997f1556157b8c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  x: 0
   body: {fileID: 714160297}
   groundCheck: {fileID: 1202183441}
   wallCheckRight: {fileID: 2132159894}
