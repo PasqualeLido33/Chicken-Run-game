@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 
 public class movment : MonoBehaviour
 {
@@ -11,8 +12,8 @@ public class movment : MonoBehaviour
     float JumpPower = 16f;
     bool isFacingRight = true;
     bool canDash = false;
+    bool canDoubleJump = false;
 
-        
 
     [SerializeField] Rigidbody2D body;
     [SerializeField] Transform groundCheck;
@@ -22,6 +23,7 @@ public class movment : MonoBehaviour
     [SerializeField] LayerMask wallLayer;
     [SerializeField] SpriteRenderer sprite;
 
+ 
     void Start()
     {
       
@@ -40,18 +42,18 @@ public class movment : MonoBehaviour
 
         
         //DASH
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) && !isGrounded())
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Joystick1Button7))
         {
                 
             for (float i = 0f; i < 4f; i = i + 0.002f)
             {
             if (isFacingRight && canDash)
             {
-                body.AddForce(Vector2.right * 3, ForceMode2D.Force);
+                body.AddForce(Vector2.right * 3f, ForceMode2D.Force);
             }
             if (!isFacingRight && canDash)
             {
-                body.AddForce(Vector2.left * 3, ForceMode2D.Force);
+                body.AddForce(Vector2.left * 3f, ForceMode2D.Force);
                     
             }
                     
@@ -60,7 +62,7 @@ public class movment : MonoBehaviour
         }
 
         //JUMP
-        if (Input.GetKeyDown(KeyCode.Space)&& isGrounded())
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && isGrounded())
         {
             body.velocity = new Vector2 (body.velocity.x, JumpPower);
             
@@ -68,7 +70,9 @@ public class movment : MonoBehaviour
         }
 
         //DOUBLE JUMP
-        if (Input.GetKeyDown(KeyCode.Space) && !isGrounded() && canDash)
+
+        if(!isGrounded() && canDash) {canDoubleJump = true;}else{canDoubleJump = false;}
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && canDoubleJump)
         {
             body.velocity = new Vector2(body.velocity.x, JumpPower);
             canDash = false;
@@ -76,7 +80,7 @@ public class movment : MonoBehaviour
             
         
         //JUMP DROP
-        if (Input.GetKeyUp(KeyCode.Space) && body.velocity.y > 0f)
+        if ((Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.JoystickButton1)) && body.velocity.y > 0f)
         {
             body.velocity = new Vector2(body.velocity.x, body.velocity.y * 0.5f);
         }
