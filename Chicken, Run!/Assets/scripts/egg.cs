@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class egg : MonoBehaviour
 {
-
+    public Collider2D Collider;
+    public SpriteRenderer Sprite;
     [SerializeField] Animator animator;
     [SerializeField] BoxCollider2D fence;
 
@@ -14,7 +15,8 @@ public class egg : MonoBehaviour
         {
             animator.SetBool("FenceDown", true);
             fence.isTrigger = true;
-            Destroy(gameObject);
+            Collider.gameObject.SetActive(false);
+            Sprite.gameObject.SetActive(false);
         }
     }
     void Start()

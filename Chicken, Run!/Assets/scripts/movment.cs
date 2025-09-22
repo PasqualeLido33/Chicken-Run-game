@@ -14,7 +14,7 @@ public class movment : MonoBehaviour
     bool canDash = false;
     bool canDoubleJump = false;
 
-
+    public killPlayer Killplayer;
     [SerializeField] Rigidbody2D body;
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform wallCheckRight;
@@ -29,65 +29,68 @@ public class movment : MonoBehaviour
       
     }
 
-   
+
     void Update()
     {
-        horizontal = Input.GetAxisRaw("Horizontal");
-        flip();
-
-        //DASH OBTAINED
-        if(isTuchingWallLeft() || isTutchingWallRight()) {canDash = true;}
-        if (isGrounded()) { canDash = true; }
-        if (canDash) { sprite.color = Color.red; } else { sprite.color = Color.white; }
-
-        
-        //DASH
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Joystick1Button7))
+        if (Killplayer.Died == false)
         {
-                
-            for (float i = 0f; i < 4f; i = i + 0.002f)
+            horizontal = Input.GetAxisRaw("Horizontal");
+            flip();
+
+            //DASH OBTAINED
+            if (isTuchingWallLeft() || isTutchingWallRight()) { canDash = true; }
+            if (isGrounded()) { canDash = true; }
+            if (canDash) { sprite.color = Color.red; } else { sprite.color = Color.white; }
+
+
+            //DASH
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Joystick1Button7))
             {
-            if (isFacingRight && canDash)
+
+                for (float i = 0f; i < 4f; i = i + 0.002f)
+                {
+                    if (isFacingRight && canDash)
+                    {
+                        body.AddForce(Vector2.right * 3f, ForceMode2D.Force);
+                    }
+                    if (!isFacingRight && canDash)
+                    {
+                        body.AddForce(Vector2.left * 3f, ForceMode2D.Force);
+
+                    }
+
+                }
+                canDash = false;
+            }
+
+            //JUMP
+            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && isGrounded())
             {
-                body.AddForce(Vector2.right * 3f, ForceMode2D.Force);
+                body.velocity = new Vector2(body.velocity.x, JumpPower);
+
+
             }
-            if (!isFacingRight && canDash)
+
+            //DOUBLE JUMP
+
+            if (!isGrounded() && canDash) { canDoubleJump = true; } else { canDoubleJump = false; }
+            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && canDoubleJump)
             {
-                body.AddForce(Vector2.left * 3f, ForceMode2D.Force);
-                    
+                body.velocity = new Vector2(body.velocity.x, JumpPower);
+                canDash = false;
             }
-                    
+
+
+            //JUMP DROP
+            if ((Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.JoystickButton1)) && body.velocity.y > 0f)
+            {
+                body.velocity = new Vector2(body.velocity.x, body.velocity.y * 0.5f);
             }
-         canDash = false;
+
+
+
+
         }
-
-        //JUMP
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && isGrounded())
-        {
-            body.velocity = new Vector2 (body.velocity.x, JumpPower);
-            
-            
-        }
-
-        //DOUBLE JUMP
-
-        if(!isGrounded() && canDash) {canDoubleJump = true;}else{canDoubleJump = false;}
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && canDoubleJump)
-        {
-            body.velocity = new Vector2(body.velocity.x, JumpPower);
-            canDash = false;
-        }
-            
-        
-        //JUMP DROP
-        if ((Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.JoystickButton1)) && body.velocity.y > 0f)
-        {
-            body.velocity = new Vector2(body.velocity.x, body.velocity.y * 0.5f);
-        }
-
-
-      
-
     }
 
     private bool isGrounded()

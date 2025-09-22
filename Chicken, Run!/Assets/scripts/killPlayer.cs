@@ -6,9 +6,8 @@ using UnityEngine;
 public class killPlayer : MonoBehaviour
 {
     public GameObject player;
-    public Transform respawnPoint;
     public GameManager gameManager;
-    bool Died = false;
+    public bool Died = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -16,7 +15,8 @@ public class killPlayer : MonoBehaviour
         {
             
             Died = true;
-            player.transform.position = respawnPoint.position;
+            print(Died);
+            
         }
     }
     
@@ -29,6 +29,6 @@ public class killPlayer : MonoBehaviour
     
     void Update()
     {
-        if (Died == true) { gameManager.PlayerRespawned();  Died = false; Debug.Log("Died"); }
+        if (Died) { gameManager.PlayerRespawned(); }
     }
 }
