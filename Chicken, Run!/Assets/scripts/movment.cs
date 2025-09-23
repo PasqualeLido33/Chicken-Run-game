@@ -4,17 +4,24 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using System;
 
 public class movment : MonoBehaviour
 {
     float horizontal;
     float speed = 8f;
     float JumpPower = 16f;
+    float dashingPower = 1000f;
+    float dashingTime = 0.3f;
+    
     bool isFacingRight = true;
     bool canDash = false;
+    bool isDashing;
     bool canDoubleJump = false;
+    bool canJump = false;
 
     public killPlayer Killplayer;
+    Animator animator;
     [SerializeField] Rigidbody2D body;
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform wallCheckRight;
@@ -22,55 +29,58 @@ public class movment : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] LayerMask wallLayer;
     [SerializeField] SpriteRenderer sprite;
+    [SerializeField] TrailRenderer trail;
 
  
     void Start()
     {
-      
+      animator = GetComponent<Animator>();
     }
 
 
     void Update()
     {
+        print(canDash);
         if (Killplayer.Died == false)
         {
             horizontal = Input.GetAxisRaw("Horizontal");
             flip();
 
             //DASH OBTAINED
-            if (isTuchingWallLeft() || isTutchingWallRight()) { canDash = true; }
-            if (isGrounded()) { canDash = true; }
-            if (canDash) { sprite.color = Color.red; } else { sprite.color = Color.white; }
+            if (isTuchingWallLeft() || isTuchingWallRight()) { canDoubleJump = true; canJump = true; } else { animator.SetBool("isJumping", true); }
+            if (isTuchingWallRight() && !isGrounded()) { animator.SetBool("isTuchingWallRight", true); animator.SetBool("isJumping", false); } else { animator.SetBool("isTuchingWallRight", false); }
+            if (isTuchingWallLeft() && !isGrounded()) { animator.SetBool("isTuchingWallLeft", true); animator.SetBool("isJumping", false); } else { animator.SetBool("isTuchingWallLeft", false); }
+            if (isGrounded()) { canJump = true; canDash = true; animator.SetBool("isJumping", false); }
+            if (isGrounded() && body.velocity.x == 0f ){ canDash = false; }
 
 
             //DASH
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Joystick1Button7))
+            if ((Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Joystick1Button7)) && canDash)
             {
 
-                for (float i = 0f; i < 4f; i = i + 0.002f)
+                if (!isTuchingWallLeft() || !isTuchingWallRight())
                 {
-                    if (isFacingRight && canDash)
-                    {
-                        body.AddForce(Vector2.right * 3f, ForceMode2D.Force);
-                    }
-                    if (!isFacingRight && canDash)
-                    {
-                        body.AddForce(Vector2.left * 3f, ForceMode2D.Force);
-
-                    }
-
+                    animator.SetBool("isDashing", true);
+                    StartCoroutine(Dash());
+                    canDoubleJump = false;
+                    canJump = false;
                 }
-                canDash = false;
+
+
             }
+            else { animator.SetBool("isDashing", false); }
 
             //JUMP
-            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && isGrounded())
-            {
-                body.velocity = new Vector2(body.velocity.x, JumpPower);
+            if (!isDashing) 
+            { 
+                if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1)) && canJump)
+                {
+                    body.velocity = new Vector2(body.velocity.x, JumpPower);
+                    animator.SetBool("isJumping", true);
+                    canJump = false;
 
-
+                }
             }
-
             //DOUBLE JUMP
 
             if (!isGrounded() && canDash) { canDoubleJump = true; } else { canDoubleJump = false; }
@@ -93,9 +103,27 @@ public class movment : MonoBehaviour
         }
     }
 
+    private IEnumerator Dash()
+    {
+        canDash = false;
+        isDashing = true;
+        float originalGravity = body.gravityScale;
+        body.gravityScale = 0f;
+        body.velocity = new Vector2(transform.localScale.x * dashingPower, 0);
+        trail.emitting = true;
+        Time.timeScale = 2f;
+        yield return new WaitForSeconds(dashingTime);
+        Time.timeScale = 1f;
+        trail.emitting = false;
+        body.gravityScale = originalGravity;
+        isDashing = false;
+        
+    }
+
     private bool isGrounded()
     {
         return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        
     }
 
     private bool isTuchingWallLeft()
@@ -104,14 +132,17 @@ public class movment : MonoBehaviour
         
     }
 
-    private bool isTutchingWallRight()
+    private bool isTuchingWallRight()
     {
         return Physics2D.OverlapCircle(wallCheckRight.position, 0.2f, wallLayer);
     }
 
+
     private void FixedUpdate()
     {
         body.velocity = new Vector2(horizontal * speed, body.velocity.y);
+        animator.SetFloat("xVelocity", Math.Abs(body.velocity.x));
+        animator.SetFloat("yVelocity", body.velocity.y);
     }
     private void flip()
     {

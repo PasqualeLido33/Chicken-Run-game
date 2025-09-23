@@ -15,12 +15,12 @@ public class GameManager : MonoBehaviour
     private killPlayer[] allDeathZones;
     [SerializeField] BoxCollider2D fence;
     [SerializeField] Animator animator;
-
+    [SerializeField] Rigidbody2D playerbody;
 
     private bool waitingForRestart = false;
 
-    public float slowDuration = 1.5f; // quanto dura lo slow motion
-    public float slowFactor = 0.2f;
+    public float slowDuration = 0.5f; // quanto dura lo slow motion
+    public float slowFactor = 0.5f;
 
     int level = 1;
     void Start()
@@ -52,40 +52,59 @@ public class GameManager : MonoBehaviour
     private IEnumerator DeathSlowMotion()
     {
         // Attiva slow motion
+        slowFactor = 0.5f;
         Time.timeScale = slowFactor;
-        
+        playerbody.drag = 10000;
+        messageText.text = "Press SPACE to run!";
+        messageText.gameObject.SetActive(true);
+        foreach (killPlayer dz in allDeathZones)
+        {
+            dz.Died = true;
+        }
 
         // Aspetta "slowDuration" secondi reali (indipendente dal timeScale)
         yield return new WaitForSecondsRealtime(slowDuration);
 
         // Ripristina tempo normale
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
 
 
-        // Mostra messaggio di restart
+        player.transform.position = respawnPoint.position;
+
+
+        waitingForRestart = true;
+        
+        
         foreach (killPlayer dz in allDeathZones)
         {
             dz.Died = false;
         }
-            player.transform.position = respawnPoint.position;
-        waitingForRestart = true;
-        messageText.text = "Press SPACE to run!";
-        messageText.gameObject.SetActive(true);
         
     }
 
     void Update()
     {
         
-        if (waitingForRestart && Input.GetKeyDown(KeyCode.Space))
+            
+            
+
+        
+        if (waitingForRestart && Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
+            // Nascondi messaggio
+
+            messageText.gameObject.SetActive(false);
             // Riprendi il gioco
+
             Time.timeScale = 1f;
+            slowFactor = 1f;
+            playerbody.drag = 0;
+            
+
             waitingForRestart = false;
             
 
-            // Nascondi messaggio
-            messageText.gameObject.SetActive(false);
+            
             
         }
     }
