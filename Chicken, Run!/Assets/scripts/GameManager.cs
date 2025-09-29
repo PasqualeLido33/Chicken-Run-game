@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public Transform respawnPoint;
     private killPlayer[] allDeathZones;
     [SerializeField] BoxCollider2D fence;
-    [SerializeField] Animator animator;
+    [SerializeField] Animator fence_animator;
     [SerializeField] Rigidbody2D playerbody;
 
     private bool waitingForRestart = false;
@@ -34,12 +34,12 @@ public class GameManager : MonoBehaviour
 
         EggCollider.gameObject.SetActive(true);
         EggSprite.gameObject.SetActive(true);
-        animator.SetBool("FenceDown", false);
+        fence_animator.SetBool("FenceDown", false);
         fence.isTrigger = false;
 
 
         Debug.Log("Respawn");
-
+        
         // Aspetta il tempo rallentato
         StartCoroutine(DeathSlowMotion());
 
@@ -68,10 +68,10 @@ public class GameManager : MonoBehaviour
         // Ripristina tempo normale
         Time.timeScale = 1f;
 
-
+        
         player.transform.position = respawnPoint.position;
 
-
+        
         waitingForRestart = true;
         
         
@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         
-            
+        
             
 
         

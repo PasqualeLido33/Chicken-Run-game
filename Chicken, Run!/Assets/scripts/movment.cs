@@ -13,7 +13,7 @@ public class movment : MonoBehaviour
     float JumpPower = 16f;
     float dashingPower = 1000f;
     float dashingTime = 0.3f;
-    
+
     bool isFacingRight = true;
     bool canDash = false;
     bool isDashing;
@@ -43,6 +43,7 @@ public class movment : MonoBehaviour
         print(canDash);
         if (Killplayer.Died == false)
         {
+            animator.SetBool("isDead", false);
             horizontal = Input.GetAxisRaw("Horizontal");
             flip();
 
@@ -51,7 +52,7 @@ public class movment : MonoBehaviour
             if (isTuchingWallRight() && !isGrounded()) { animator.SetBool("isTuchingWallRight", true); animator.SetBool("isJumping", false); } else { animator.SetBool("isTuchingWallRight", false); }
             if (isTuchingWallLeft() && !isGrounded()) { animator.SetBool("isTuchingWallLeft", true); animator.SetBool("isJumping", false); } else { animator.SetBool("isTuchingWallLeft", false); }
             if (isGrounded()) { canJump = true; canDash = true; animator.SetBool("isJumping", false); }
-            if (isGrounded() && body.velocity.x == 0f ){ canDash = false; }
+           // if (isGrounded() && body.velocity.x == 0f ){ canDash = false; }
 
 
             //DASH
@@ -101,6 +102,7 @@ public class movment : MonoBehaviour
 
 
         }
+        else { animator.SetBool("isDead", true); animator.SetBool("isDashing", false); animator.SetBool("isJumping", false); animator.SetBool("isTuchingWallRight", false); animator.SetBool("isTuchingWallLeft", false); }
     }
 
     private IEnumerator Dash()

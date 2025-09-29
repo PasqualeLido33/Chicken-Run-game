@@ -476,7 +476,7 @@ MonoBehaviour:
   messageText: {fileID: 5515288}
   respawnPoint: {fileID: 884958009}
   fence: {fileID: 814428841}
-  animator: {fileID: 814428839}
+  fence_animator: {fileID: 814428839}
   playerbody: {fileID: 714160297}
   slowDuration: 1.5
   slowFactor: 0.2
