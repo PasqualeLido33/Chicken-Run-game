@@ -40,7 +40,7 @@ public class movment : MonoBehaviour
 
     void Update()
     {
-        print(canDash);
+        //print(canDash);
         if (Killplayer.Died == false)
         {
             animator.SetBool("isDead", false);

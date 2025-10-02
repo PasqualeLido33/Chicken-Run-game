@@ -16,13 +16,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] BoxCollider2D fence;
     [SerializeField] Animator fence_animator;
     [SerializeField] Rigidbody2D playerbody;
+    [SerializeField] BoxCollider2D antiCheat;
 
     private bool waitingForRestart = false;
 
     public float slowDuration = 0.5f; // quanto dura lo slow motion
     public float slowFactor = 0.5f;
 
-    int level = 1;
+    public int level = 1;
     void Start()
     {
         messageText.gameObject.SetActive(false);
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
 
         EggCollider.gameObject.SetActive(true);
         EggSprite.gameObject.SetActive(true);
+        antiCheat.isTrigger = false;
         fence_animator.SetBool("FenceDown", false);
         fence.isTrigger = false;
 
@@ -81,6 +83,8 @@ public class GameManager : MonoBehaviour
         }
         
     }
+
+    
 
     void Update()
     {

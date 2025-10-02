@@ -8,6 +8,7 @@ public class egg : MonoBehaviour
     public SpriteRenderer Sprite;
     [SerializeField] Animator animator;
     [SerializeField] BoxCollider2D fence;
+    [SerializeField] BoxCollider2D antiCheat;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -17,6 +18,7 @@ public class egg : MonoBehaviour
             fence.isTrigger = true;
             Collider.gameObject.SetActive(false);
             Sprite.gameObject.SetActive(false);
+            antiCheat.isTrigger = true;
         }
     }
     void Start()
